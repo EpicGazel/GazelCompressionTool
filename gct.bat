@@ -1,8 +1,5 @@
 @echo off
 
-for /F "delims=" %%A in ('wmic cpu get NumberOfCores /format:value ^| find "NumberOfCores"') do set %%A
-set /a "numThreads=%NumberOfCores%*2"
-
 if [%1]==[] goto UserInput
 if %1==-C set "inputFile=%2" & set "menuOption=C" & goto Compress
 if %1==-D set "inputFile=%2" & set "menuOption=D" & goto Decompress
@@ -31,14 +28,14 @@ call set "outputFile=%%inputFile:%extension%=%%"
 echo Running precomp
 precomp.exe -cn -o"precompiledfile.pcf" %inputFile%
 
-echo Running zpaq64
-zpaq64 add "%outputfile%zpaq64" "precompiledfile.pcf" -m5 -t%numThreads%
+echo Running zpaq
+zpaq64 add "%outputfile%zpaq" "precompiledfile.pcf" -m5 -t%number_of_processors%
 
 goto Cleanup
 
 :Decompress
-echo Unpacking zpaq64
-zpaq64 x %inputFile% -t%numThreads%
+echo Unpacking zpaq
+zpaq64 x %inputFile% -t%number_of_processors%
 
 echo Recompiling pcf
 precomp -r "precompiledfile.pcf"
@@ -46,7 +43,7 @@ precomp -r "precompiledfile.pcf"
 goto Cleanup
 
 :Cleanup
-if %menuOption%==C echo Compression completed, output %outputFile%zpaq64
+if %menuOption%==C echo Compression completed, output %outputFile%zpaq
 if %menuOption%==D echo Decompression completed.
 
 echo Cleaning up
@@ -69,4 +66,3 @@ pause & exit
 del %inputFile% precomp.exe zpaq64.exe
 (goto) 2>nul & del gct.bat
 pause & exit
-p
