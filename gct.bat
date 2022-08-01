@@ -1,9 +1,12 @@
 @echo off
-if %1==-C set "inputFile=%2" & set "menuOption=C" & goto Compress
-if %1==-D set "inputFile=%2" & set "menuOption=D" & goto Decompress
-set /p "menuOption=(C)ompress, (D)ecompress, (Q)uit: "
+if [%1]==[] goto UserInput
+if %1==-C set "inputFile=%2" & set "menuOption=C" & set "numThreads=4" & goto Compress
+if %1==-D set "inputFile=%2" & set "menuOption=D" & set "numThreads=4" & goto Decompress
 
+:UserInput
+set /p "menuOption=(C)ompress, (D)ecompress, (Q)uit: "
 if %menuOption%==Q exit
+
 
 set /p "inputFile=Enter file path: "
 set /p "numThreads=Enter number of threads: "
@@ -31,7 +34,7 @@ goto Cleanup
 
 :Decompress
 echo Unpacking zpaq
-zpaq x %inputFile% -t12
+zpaq x %inputFile% -t%numThreads%
 
 echo Recompiling pcf
 precomp -r "precompiledfile.pcf"
@@ -39,19 +42,27 @@ precomp -r "precompiledfile.pcf"
 goto Cleanup
 
 :Cleanup
-echo Cleaning up
-del "precompiledfile.pcf"
-
 if %menuOption%==C echo Compression completed, output %outputFile%zpaq
 if %menuOption%==D echo Decompression completed.
 
+echo Cleaning up
+del "precompiledfile.pcf"
+
 ::Special Cleanup for auto extraction, deletes archive or zip
-if %3==--cleanup del %inputFile%
+if [%1]==[] pause & exit
+if %1==--cleanup goto CleanInstall
 
+if [%3]==[] pause & exit
+if %3==--cleanup goto CleanAll
+pause & exit
+
+:CleanInstall
+(goto) 2>nul & del precomp.exe zpaq.exe gct.bat
+pause & exit
+
+:CleanAll
 ::Cleans up after compressing/decompressing
-if %1==--cleanup (goto) 2>nul & del precomp.exe zpaq.exe gct.bat
-if %1==-C (goto) 2>nul & del precomp.exe zpaq.exe gct.bat
-if %1==-D (goto) 2>nul & del precomp.exe zpaq.exe gct.bat
-
-pause
-exit
+del %inputFile% precomp.exe zpaq.exe
+(goto) 2>nul & del gct.bat
+pause & exit
+p
