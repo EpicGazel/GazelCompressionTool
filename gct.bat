@@ -31,14 +31,14 @@ call set "outputFile=%%inputFile:%extension%=%%"
 echo Running precomp
 precomp.exe -cn -o"precompiledfile.pcf" %inputFile%
 
-echo Running zpaq
-zpaq add "%outputfile%zpaq" "precompiledfile.pcf" -m5 -t%numThreads%
+echo Running zpaq64
+zpaq64 add "%outputfile%zpaq64" "precompiledfile.pcf" -m5 -t%numThreads%
 
 goto Cleanup
 
 :Decompress
-echo Unpacking zpaq
-zpaq x %inputFile% -t%numThreads%
+echo Unpacking zpaq64
+zpaq64 x %inputFile% -t%numThreads%
 
 echo Recompiling pcf
 precomp -r "precompiledfile.pcf"
@@ -46,7 +46,7 @@ precomp -r "precompiledfile.pcf"
 goto Cleanup
 
 :Cleanup
-if %menuOption%==C echo Compression completed, output %outputFile%zpaq
+if %menuOption%==C echo Compression completed, output %outputFile%zpaq64
 if %menuOption%==D echo Decompression completed.
 
 echo Cleaning up
@@ -61,12 +61,12 @@ if %3==--cleanup goto CleanAll
 pause & exit
 
 :CleanInstall
-(goto) 2>nul & del precomp.exe zpaq.exe gct.bat
+(goto) 2>nul & del precomp.exe zpaq64.exe gct.bat
 pause & exit
 
 :CleanAll
 ::Cleans up after compressing/decompressing
-del %inputFile% precomp.exe zpaq.exe
+del %inputFile% precomp.exe zpaq64.exe
 (goto) 2>nul & del gct.bat
 pause & exit
 p
