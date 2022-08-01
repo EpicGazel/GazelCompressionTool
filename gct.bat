@@ -1,7 +1,11 @@
 @echo off
+
+for /F "delims=" %%A in ('wmic cpu get NumberOfCores /format:value ^| find "NumberOfCores"') do set %%A
+set /a "numThreads=%NumberOfCores%*2"
+
 if [%1]==[] goto UserInput
-if %1==-C set "inputFile=%2" & set "menuOption=C" & set "numThreads=4" & goto Compress
-if %1==-D set "inputFile=%2" & set "menuOption=D" & set "numThreads=4" & goto Decompress
+if %1==-C set "inputFile=%2" & set "menuOption=C" & goto Compress
+if %1==-D set "inputFile=%2" & set "menuOption=D" & goto Decompress
 
 :UserInput
 set /p "menuOption=(C)ompress, (D)ecompress, (Q)uit: "
@@ -9,7 +13,7 @@ if %menuOption%==Q exit
 
 
 set /p "inputFile=Enter file path: "
-set /p "numThreads=Enter number of threads: "
+::set /p "numThreads=Enter number of threads: "
 
 if %menuOption%==C goto Compress
 if %menuOption%==D goto Decompress
